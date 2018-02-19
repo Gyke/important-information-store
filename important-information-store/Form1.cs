@@ -1,4 +1,5 @@
-﻿using System;
+﻿using important_information_store.Methods;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,8 +21,6 @@ namespace important_information_store
         public Form1()
         {
             InitializeComponent();
-            label1.Hide();
-            label2.Hide();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -29,58 +28,18 @@ namespace important_information_store
 
         }
 
-        public void Encrypt()
-        {
-            Method1();
-            Method2();
-            Method3();
-            //...
-
-        }
-
-        public void Decrypt()
-        {
-
-        }
-
-        public void Serialization()
-        {
-
-        }
-
-        public void Deserialization()
-        {
-
-        }
-
-        public void Method1()
-        {
-
-        }
-
-        public void Method2()
-        {
-
-        }
-        public void Method3()
-        {
-
-        }
-
         private void button1_Click(object sender, EventArgs e) // button of encrypting
         {
+            var First_Method = new RSA();
+
             path = textBox1.Text;
             textBox1.Text = "";
 
             try
             {
                 data.msg = File.ReadAllText(path);
-                Encrypt();
 
-
-                label1.Show();
-                label2.Show();
-                label2.Text = secretCode.ToString(); 
+                First_Method.Method(data.msg, path);
             }
             catch
             {
@@ -90,6 +49,7 @@ namespace important_information_store
 
         private void button2_Click(object sender, EventArgs e)  // button of decrypting
         {
+            var First_Method = new RSA();
 
             path = textBox1.Text;
             textBox1.Text = "";
@@ -97,12 +57,17 @@ namespace important_information_store
             try
             {
                 data.msg = File.ReadAllText(path);
-                Decrypt();
+                First_Method.Method(data.msg, secretCode, path);
             }
             catch
             {
                 var msg = MessageBox.Show("Error");
             }
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
         }
     }
 
@@ -110,5 +75,4 @@ namespace important_information_store
     {
         public string msg;
     }
-
 }
