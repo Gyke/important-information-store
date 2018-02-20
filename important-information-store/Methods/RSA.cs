@@ -5,14 +5,12 @@ using System.Windows.Forms;
 
 namespace important_information_store.Methods
 {
-    public class RSA
+    public class Variables
     {
-        public class Variables
-        {
-            public const int level = 225;
-            public static long e, d, n, functionEuler;
+        public const int level = 1024;
+        public static ulong e, d, n, functionEuler;
 
-            public static char[] symbols = new char[] { 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н',
+        public static char[] symbols = new char[] { 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н',
                                                     'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
                                                     'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
                                                     'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ',
@@ -24,65 +22,72 @@ namespace important_information_store.Methods
                                                     '&', '*', '(', ')', '_', '+', '-', '=', '}', '{', ']', '[', ':', '"', '|',
                                                     '\\', ',', '\'', ';', '<', '>', '?', '.', '/', '\0'
                                                   };
-        }
+    }
 
-        public class Calculation
+    public class Calculation
+    {
+        public static void Calculate()
         {
-            public static void Calculate()
-            {
-                var rand = new Random();
+            var rand = new Random();
 
-                var p = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
-                var q = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
+            var p = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
+            var q = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
 
-                while (SimpleNumber(p) == false || SimpleNumber(q) == false || (p == q))
-                {
-                    p = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
-                    q = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
-                }
+            Variables.e = (ulong)rand.Next(2, 6);
+            Variables.e = (ulong)Math.Pow(2, Math.Pow(2, Variables.e)) + 1;
 
-                Variables.n = Convert.ToUInt32(p * q);
-                Variables.functionEuler = Convert.ToUInt32((p - 1) * (q - 1));
-            }
+            Variables.n = (ulong)p * (ulong)q;
+            Variables.functionEuler = (ulong)(p - 1) * (ulong)(q - 1);
 
-            public static void Calculate_d()
-            {
-                Variables.d = Variables.functionEuler - 1;
-
-                for (long i = 2; i <= Variables.functionEuler; i++)
-                    if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
-                    {
-                        Variables.d--;
-                        i = 1;
-                    }
-            }
-
-            public static bool SimpleNumber(long n)
-            {
-                if (n < 2)
-                    return false;
-                else if (n == 2)
-                    return true;
-                for (long i = 2; i < n; i++)
-                    if (n % i == 0)
-                        return false;
-
-                return true;
-            }
-
-            public static void Calculate_e()
-            {
-                Variables.e = Convert.ToUInt32(Variables.level);
-                while (true)
-                {
-                    if ((Variables.e * Variables.d) % Variables.functionEuler == 1)
-                        break;
-                    else
-                        Variables.e++;
-                }
-            }
+            Calculate_d();
         }
 
+        private static List<int> ConvertToBinary(ulong number)
+        {
+            List<int> answer = new List<int>();
+
+            for (int i = 0; number > 0; i++)
+            {
+                answer.Add((int)(number % 2));
+                number = number / 2;
+            }
+
+            return answer;
+        }
+
+        public static UInt64 FastPow(UInt64 number, UInt64 n)
+        {
+            UInt64 answer = new UInt64();
+            answer = Convert.ToUInt64(number);
+            var binaryExp = ConvertToBinary(n);
+
+            for (int i = 0; i < binaryExp.Count - 1; i++)
+            {
+                if (binaryExp[i] == 1)
+                    answer = (UInt64)Math.Pow(answer, 2) * (UInt64)number;
+                else if (binaryExp[i] == 0)
+                    answer = (UInt64)Math.Pow(answer, 2);
+                else return 0;
+            }
+
+            return answer;
+        }
+
+        public static void Calculate_d()
+        {
+            Variables.d = Variables.functionEuler - 1;
+
+            for (ulong i = 2; i <= Variables.functionEuler; i++)
+                if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
+                {
+                    Variables.d--;
+                    i = 1;
+                }
+        }
+    }
+
+    public class RSA
+    {
         public void Method(string text, string path)                         //Encrypting method
         {
             try
