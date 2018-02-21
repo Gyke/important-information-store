@@ -8,7 +8,7 @@ namespace important_information_store.Methods
     public class Variables
     {
         public const int level = 1024;
-        public static ulong e, d, n, functionEuler;
+        public static double e, d, n, functionEuler;
 
         public static char[] symbols = new char[] { 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н',
                                                     'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
@@ -33,54 +33,64 @@ namespace important_information_store.Methods
             var p = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
             var q = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
 
-            Variables.e = (ulong)rand.Next(2, 6);
-            Variables.e = (ulong)Math.Pow(2, Math.Pow(2, Variables.e)) + 1;
+            Variables.e = rand.Next(2, 6);
+            Variables.e = Math.Pow(2, Math.Pow(2, Variables.e)) + 1;
 
-            Variables.n = (ulong)p * (ulong)q;
-            Variables.functionEuler = (ulong)(p - 1) * (ulong)(q - 1);
+            Variables.n = p * q;
+            Variables.functionEuler = (p - 1) * (q - 1);
 
             Calculate_d();
         }
 
-        private static List<int> ConvertToBinary(ulong number)
+        private static List<int> ConvertToBinary(double number)
         {
             List<int> answer = new List<int>();
-
             for (int i = 0; number > 0; i++)
             {
-                answer.Add((int)(number % 2));
-                number = number / 2;
+                answer.Add((int)(number % 2));                      // check here
+                number = (int)number / 2;
             }
 
             return answer;
         }
 
-        public static UInt64 FastPow(UInt64 number, UInt64 n)
+        public static double FastPow(double number, double n)       // check here everything
         {
-            UInt64 answer = new UInt64();
-            answer = Convert.ToUInt64(number);
+            double answer = number;
             var binaryExp = ConvertToBinary(n);
 
             for (int i = 0; i < binaryExp.Count - 1; i++)
             {
                 if (binaryExp[i] == 1)
-                    answer = (UInt64)Math.Pow(answer, 2) * (UInt64)number;
+                    answer = Math.Pow(answer, 2) * number;
                 else if (binaryExp[i] == 0)
-                    answer = (UInt64)Math.Pow(answer, 2);
+                    answer = Math.Pow(answer, 2);
                 else return 0;
             }
 
             return answer;
         }
 
-        public static void Calculate_d()
-        {
+        public static void Calculate_d()                            // check this method maybe opperation d++ will be better?
+        {                                                           // how should i realize calculate_d-method
             Variables.d = Variables.functionEuler - 1;
 
-            for (ulong i = 2; i <= Variables.functionEuler; i++)
+            /*Variables.d = Variables.functionEuler + 1;
+             * while(true)
+             * {
+             *  if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
+             *   {
+             *       Variables.d++;                                  
+             *       i = 1;
+             *   }
+             * 
+             * }
+            */
+
+            for (double i = 2; i <= Variables.functionEuler; i++)
                 if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
                 {
-                    Variables.d--;
+                    Variables.d--;                                  //ive said about it
                     i = 1;
                 }
         }
@@ -117,21 +127,21 @@ namespace important_information_store.Methods
         {
             string answer = "";
 
-            long tmp;
+            //long tmp;
 
-            for (int item = 0; item < text.Length; item++)
-            {
-                tmp = Convert.ToInt64(item);
-                tmp = (long)Math.Pow(tmp, Variables.d);
+            //for (int item = 0; item < text.Length; item++)
+            //{
+            //    tmp = Convert.ToInt64(item);
+            //    tmp = (long)Math.Pow(tmp, Variables.d);
 
-                long n_Upper = Variables.n;
+            //    long n_Upper = Variables.n;
 
-                tmp = tmp % n_Upper;
+            //    tmp = tmp % n_Upper;
 
-                int index = Convert.ToInt32(tmp.ToString());
+            //    int index = Convert.ToInt32(tmp.ToString());
 
-                answer += Variables.symbols[index].ToString();
-            }
+            //    answer += Variables.symbols[index].ToString();
+            //}
 
             return answer;
         }
@@ -140,21 +150,21 @@ namespace important_information_store.Methods
         {
             string answer = "";
 
-            long tmp;
+            //long tmp;
 
-            for (int i = 0; i < text.Length; i++)
-            {
-                int index = Array.IndexOf(Variables.symbols, text[i]);
+            //for (int i = 0; i < text.Length; i++)
+            //{
+            //    int index = Array.IndexOf(Variables.symbols, text[i]);
 
-                tmp = index;
-                tmp = (long)Math.Pow(tmp, Variables.e);
+            //    tmp = index;
+            //    tmp = (long)Math.Pow(tmp, Variables.e);
 
-                long n_Upper = Variables.n;
+            //    long n_Upper = Variables.n;
 
-                tmp = tmp % n_Upper;
+            //    tmp = tmp % n_Upper;
 
-                answer += tmp;
-            }
+            //    answer += tmp;
+            //}
             return answer;
         }
     }
