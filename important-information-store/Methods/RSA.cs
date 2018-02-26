@@ -4,40 +4,23 @@ using System.IO;
 using System.Windows.Forms;
 
 namespace important_information_store.Methods
-{
-    public class Variables
+{    public class Calculation
     {
         public const int level = 1024;
         public static double e, d, n, functionEuler;
 
-        public static char[] symbols = new char[] { 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н',
-                                                    'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь',
-                                                    'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
-                                                    'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ',
-                                                    'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                                                    'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                                                    'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                                                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2',
-                                                    '3', '4', '5', '6', '7', '8', '9', '0', ' ', '!', '@', '#', '$', '%', '^',
-                                                    '&', '*', '(', ')', '_', '+', '-', '=', '}', '{', ']', '[', ':', '"', '|',
-                                                    '\\', ',', '\'', ';', '<', '>', '?', '.', '/', '\0'
-                                                  };
-    }
-
-    public class Calculation
-    {
         public static void Calculate()
         {
             var rand = new Random();
 
-            var p = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
-            var q = rand.Next((int)(Math.Sqrt(Variables.level)) + 1, Variables.level);
+            double p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
+            double q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
 
-            Variables.e = rand.Next(2, 6);
-            Variables.e = Math.Pow(2, Math.Pow(2, Variables.e)) + 1;
+            e = rand.Next(2, 6);
+            e = Math.Pow(2, Math.Pow(2, e)) + 1;
 
-            Variables.n = p * q;
-            Variables.functionEuler = (p - 1) * (q - 1);
+            n = p * q;
+            functionEuler = (p - 1) * (q - 1);
 
             Calculate_d();
         }
@@ -73,27 +56,38 @@ namespace important_information_store.Methods
 
         public static void Calculate_d()                            // check this method maybe opperation d++ will be better?
         {                                                           // how should i realize calculate_d-method
-            Variables.d = Variables.functionEuler - 1;
-
-            /*Variables.d = Variables.functionEuler + 1;
-             * while(true)
-             * {
-             *  if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
-             *   {
-             *       Variables.d++;                                  
-             *       i = 1;
-             *   }
-             * 
-             * }
-            */
-
-            for (double i = 2; i <= Variables.functionEuler; i++)
-                if ((Variables.functionEuler % i == 0) && (Variables.d % i == 0))
-                {
-                    Variables.d--;                                  //ive said about it
-                    i = 1;
-                }
+            double u, v;                                            // e*u + functionEuler*v = 1; u,v - ?
+                                                                    // u == d mod functionEuler, d++
+            d = EuclidMethod(e, functionEuler, u, v);
         }
+
+        public static double EuclidMethod(double e, double f, double u, double v)       //  e * u + f * v = 1;
+        {
+            if (e == 0)
+            {
+                u = 0; v = 1;
+                return f;
+            }
+            double u1, v1;
+            double d = EuclidMethod(f % e, e, u1, v1);
+            u = u1 - (f / e) * u1;
+            v = u1;
+            return d;
+
+            /*int gcd (int a, int b, int & x, int & y) {
+	            if (a == 0) {
+		            x = 0; y = 1;
+		            return b;
+	            }
+	            int x1, y1;
+	            int d = gcd (b%a, a, x1, y1);
+	            x = y1 - (b / a) * x1;
+	            y = x1;
+	            return d;
+                }
+             */
+        }
+
     }
 
     public class RSA
@@ -102,7 +96,8 @@ namespace important_information_store.Methods
         {
             try
             {
-
+                string answer = RSA_Encrypt(text);
+                //File.WriteAllText(path, answer);
             }
             catch
             {
@@ -132,15 +127,15 @@ namespace important_information_store.Methods
             //for (int item = 0; item < text.Length; item++)
             //{
             //    tmp = Convert.ToInt64(item);
-            //    tmp = (long)Math.Pow(tmp, Variables.d);
+            //    tmp = (long)Math.Pow(tmp, d);
 
-            //    long n_Upper = Variables.n;
+            //    long n_Upper = n;
 
             //    tmp = tmp % n_Upper;
 
             //    int index = Convert.ToInt32(tmp.ToString());
 
-            //    answer += Variables.symbols[index].ToString();
+            //    answer += symbols[index].ToString();
             //}
 
             return answer;
@@ -149,17 +144,18 @@ namespace important_information_store.Methods
         public static string RSA_Encrypt(string text)
         {
             string answer = "";
+            Calculation.Calculate();
 
             //long tmp;
 
             //for (int i = 0; i < text.Length; i++)
             //{
-            //    int index = Array.IndexOf(Variables.symbols, text[i]);
+            //    int index = Array.IndexOf(symbols, text[i]);
 
             //    tmp = index;
-            //    tmp = (long)Math.Pow(tmp, Variables.e);
+            //    tmp = (long)Math.Pow(tmp, e);
 
-            //    long n_Upper = Variables.n;
+            //    long n_Upper = n;
 
             //    tmp = tmp % n_Upper;
 
