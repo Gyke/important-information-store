@@ -7,7 +7,7 @@ namespace important_information_store.Methods
 {    public class Calculation
     {
         public const int level = 1024;
-        public static double e, d, n, functionEuler;
+        public static double e, n, d, functionEuler;
 
         public static void Calculate()
         {
@@ -16,13 +16,13 @@ namespace important_information_store.Methods
             double p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
             double q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
 
-            e = rand.Next(2, 6);
-            e = Math.Pow(2, Math.Pow(2, e)) + 1;
+            //e = rand.Next(2, 5);
+            //e = Math.Pow(2, Math.Pow(2, e)) + 1;
+            e = 17;
 
             n = p * q;
             functionEuler = (p - 1) * (q - 1);
-
-            Calculate_d();
+            d = Calculate_d();
         }
 
         private static List<int> ConvertToBinary(double number)
@@ -30,14 +30,13 @@ namespace important_information_store.Methods
             List<int> answer = new List<int>();
             for (int i = 0; number > 0; i++)
             {
-                answer.Add((int)(number % 2));                      // check here
+                answer.Add((int)(number % 2));
                 number = (int)number / 2;
             }
-
             return answer;
         }
 
-        public static double FastPow(double number, double n)       // check here everything
+        public static double FastPow(double number, double n)
         {
             double answer = number;
             var binaryExp = ConvertToBinary(n);
@@ -54,40 +53,18 @@ namespace important_information_store.Methods
             return answer;
         }
 
-        public static void Calculate_d()                            // check this method maybe opperation d++ will be better?
-        {                                                           // how should i realize calculate_d-method
-            double u, v;                                            // e*u + functionEuler*v = 1; u,v - ?
-                                                                    // u == d mod functionEuler, d++
-            d = EuclidMethod(e, functionEuler, u, v);
-        }
-
-        public static double EuclidMethod(double e, double f, double u, double v)       //  e * u + f * v = 1;
+        public static double Calculate_d()
         {
-            if (e == 0)
-            {
-                u = 0; v = 1;
-                return f;
-            }
-            double u1, v1;
-            double d = EuclidMethod(f % e, e, u1, v1);
-            u = u1 - (f / e) * u1;
-            v = u1;
-            return d;
+            double d = functionEuler - 1;
 
-            /*int gcd (int a, int b, int & x, int & y) {
-	            if (a == 0) {
-		            x = 0; y = 1;
-		            return b;
-	            }
-	            int x1, y1;
-	            int d = gcd (b%a, a, x1, y1);
-	            x = y1 - (b / a) * x1;
-	            y = x1;
-	            return d;
+            for (double i = 2; i <= functionEuler; i++)
+                if ((functionEuler % i == 0) && (d % i == 0))
+                {
+                    d--;
+                    i = 1;
                 }
-             */
+            return d;
         }
-
     }
 
     public class RSA
@@ -96,7 +73,7 @@ namespace important_information_store.Methods
         {
             try
             {
-                string answer = RSA_Encrypt(text);
+                var answer = RSA_Encrypt(text);
                 //File.WriteAllText(path, answer);
             }
             catch
@@ -122,45 +99,20 @@ namespace important_information_store.Methods
         {
             string answer = "";
 
-            //long tmp;
-
-            //for (int item = 0; item < text.Length; item++)
-            //{
-            //    tmp = Convert.ToInt64(item);
-            //    tmp = (long)Math.Pow(tmp, d);
-
-            //    long n_Upper = n;
-
-            //    tmp = tmp % n_Upper;
-
-            //    int index = Convert.ToInt32(tmp.ToString());
-
-            //    answer += symbols[index].ToString();
-            //}
-
             return answer;
         }
 
-        public static string RSA_Encrypt(string text)
+        public static List<char> RSA_Encrypt(string text)
         {
-            string answer = "";
+            List<char> answer = new List<char>();
             Calculation.Calculate();
 
-            //long tmp;
-
-            //for (int i = 0; i < text.Length; i++)
-            //{
-            //    int index = Array.IndexOf(symbols, text[i]);
-
-            //    tmp = index;
-            //    tmp = (long)Math.Pow(tmp, e);
-
-            //    long n_Upper = n;
-
-            //    tmp = tmp % n_Upper;
-
-            //    answer += tmp;
-            //}
+            double tmp;
+            for(int i = 0; i < text.Length; i++)
+            {
+                tmp = Calculation.FastPow(text[i], Calculation.e) % Calculation.n;
+                answer[i] = Convert.ToChar(tmp % 255);
+            }
             return answer;
         }
     }
