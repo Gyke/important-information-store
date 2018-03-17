@@ -4,28 +4,28 @@ using System.IO;
 using System.Windows.Forms;
 
 namespace important_information_store.Methods
-{    public class Calculation
+{
+    public class Calculation
     {
         public const int level = 1024;
-        public static double e, n, d, functionEuler;
+        public static decimal e, n, d, functionEuler;
 
         public static void Calculate()
         {
             var rand = new Random();
 
-            double p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
-            double q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
+            decimal p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
+            decimal q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
 
-            //e = rand.Next(2, 5);
-            //e = Math.Pow(2, Math.Pow(2, e)) + 1;
-            e = 17;
+            e = rand.Next(2, 5);
+            e = FastPow(2, FastPow(2, e)) + 1;
 
             n = p * q;
             functionEuler = (p - 1) * (q - 1);
             d = Calculate_d();
         }
 
-        private static List<int> ConvertToBinary(double number)
+        private static List<int> ConvertToBinary(decimal number)
         {
             List<int> answer = new List<int>();
             for (int i = 0; number > 0; i++)
@@ -36,28 +36,28 @@ namespace important_information_store.Methods
             return answer;
         }
 
-        public static double FastPow(double number, double n)
+        public static decimal FastPow(decimal number, decimal n)
         {
-            double answer = number;
+            decimal answer = number;
             var binaryExp = ConvertToBinary(n);
 
             for (int i = 0; i < binaryExp.Count - 1; i++)
             {
                 if (binaryExp[i] == 1)
-                    answer = Math.Pow(answer, 2) * number;
+                    answer = FastPow(answer, 2) * number;
                 else if (binaryExp[i] == 0)
-                    answer = Math.Pow(answer, 2);
+                    answer = FastPow(answer, 2);
                 else return 0;
             }
 
             return answer;
         }
 
-        public static double Calculate_d()
+        public static decimal Calculate_d()
         {
-            double d = functionEuler - 1;
+            decimal d = functionEuler - 1;
 
-            for (double i = 2; i <= functionEuler; i++)
+            for (decimal i = 2; i <= functionEuler; i++)
                 if ((functionEuler % i == 0) && (d % i == 0))
                 {
                     d--;
@@ -73,14 +73,19 @@ namespace important_information_store.Methods
         {
             try
             {
-                var answer = RSA_Encrypt(text);
-                //File.WriteAllText(path, answer);
+                string answer = "";
+                var tmp = RSA_Encrypt(text);
+                foreach (char count in tmp)
+                    answer += count;
+
+                File.WriteAllText(path, answer);
+                MessageBox.Show("d: " + Calculation.d + "n: " + Calculation.n);
             }
             catch
             {
-                var msg = MessageBox.Show("Error at stage of encrypting by 1st method");
+                MessageBox.Show("Error at stage of encrypting by 1st method");
             }
-        }
+}
 
         public void Method(string text, int secretCode, string path)         //Decrypting method
         {
@@ -91,7 +96,7 @@ namespace important_information_store.Methods
             }
             catch
             {
-                var msg = MessageBox.Show("Error at stage of decrypting by 1st method");
+                MessageBox.Show("Error at stage of decrypting by 1st method");
             }
         }
 
@@ -107,11 +112,11 @@ namespace important_information_store.Methods
             List<char> answer = new List<char>();
             Calculation.Calculate();
 
-            double tmp;
+            decimal tmp;
             for(int i = 0; i < text.Length; i++)
             {
-                tmp = Calculation.FastPow(text[i], Calculation.e) % Calculation.n;
-                answer[i] = Convert.ToChar(tmp % 255);
+                tmp = Calculation.FastPow((int)text[i], Calculation.e) % Calculation.n;
+                answer.Add(Convert.ToChar((int)(tmp % 255)));
             }
             return answer;
         }

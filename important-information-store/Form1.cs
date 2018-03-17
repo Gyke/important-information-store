@@ -38,7 +38,7 @@ namespace important_information_store
             try
             {
                 data.msg = File.ReadAllText(path);
-                data.msg = Convert.ToString(Encoding.UTF8);
+                data.msg = Convert.ToString(data.msg);
                 First_Method.Method(data.msg, path);
             }
             catch
