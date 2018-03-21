@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using System.Numerics;
 
 namespace important_information_store.Methods
 {
     public class Calculation
     {
         public const int level = 1024;
-        public static decimal e, n, d, functionEuler;
+        public static BigInteger e, n, d, functionEuler;
 
         public static void Calculate()
         {
             var rand = new Random();
 
-            decimal p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
-            decimal q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
+            BigInteger p = rand.Next((int)(Math.Sqrt(level)) + 1, level);
+            BigInteger q = rand.Next((int)(Math.Sqrt(level)) + 1, level);
 
             e = rand.Next(2, 5);
             e = FastPow(2, FastPow(2, e)) + 1;
@@ -25,7 +26,7 @@ namespace important_information_store.Methods
             d = Calculate_d();
         }
 
-        private static List<int> ConvertToBinary(decimal number)
+        private static List<int> ConvertToBinary(BigInteger number)
         {
             List<int> answer = new List<int>();
             for (int i = 0; number > 0; i++)
@@ -36,28 +37,29 @@ namespace important_information_store.Methods
             return answer;
         }
 
-        public static decimal FastPow(decimal number, decimal n)
+        public static BigInteger FastPow(BigInteger number, BigInteger n)
         {
-            decimal answer = number;
+            var tmp = number;
+            BigInteger answer = number;
+
             var binaryExp = ConvertToBinary(n);
 
             for (int i = 0; i < binaryExp.Count - 1; i++)
             {
                 if (binaryExp[i] == 1)
-                    answer = FastPow(answer, 2) * number;
+                    answer = BigInteger.Multiply(BigInteger.Pow(answer, 2), tmp);
                 else if (binaryExp[i] == 0)
-                    answer = FastPow(answer, 2);
+                    answer = BigInteger.Pow(answer, 2);
                 else return 0;
             }
-
             return answer;
         }
 
-        public static decimal Calculate_d()
+        public static BigInteger Calculate_d()
         {
-            decimal d = functionEuler - 1;
+            BigInteger d = functionEuler - 1;
 
-            for (decimal i = 2; i <= functionEuler; i++)
+            for (BigInteger i = 2; i <= functionEuler; i++)
                 if ((functionEuler % i == 0) && (d % i == 0))
                 {
                     d--;
@@ -79,7 +81,7 @@ namespace important_information_store.Methods
                     answer += count;
 
                 File.WriteAllText(path, answer);
-                MessageBox.Show("d: " + Calculation.d + "n: " + Calculation.n);
+                MessageBox.Show("d: " + Calculation.d + "; n: " + Calculation.n + "; e: " + Calculation.e);
             }
             catch
             {
@@ -87,10 +89,14 @@ namespace important_information_store.Methods
             }
 }
 
-        public void Method(string text, int secretCode, string path)         //Decrypting method
+        public void Method(string text, int secret_D, int secret_N, int public_E, string path)         //Decrypting method
         {
             try
             {
+                Calculation.e = public_E;
+                Calculation.d = secret_D;
+                Calculation.n = secret_N;
+
                 string answer = RSA_Decrypt(text);
                 File.WriteAllText(path, answer);
             }
@@ -103,6 +109,8 @@ namespace important_information_store.Methods
         public static string RSA_Decrypt(string text)
         {
             string answer = "";
+            foreach (int count in text)
+                answer += Convert.ToChar(Calculation.FastPow(text[count], Calculation.d) % Calculation.n);
 
             return answer;
         }
@@ -111,11 +119,10 @@ namespace important_information_store.Methods
         {
             List<char> answer = new List<char>();
             Calculation.Calculate();
-
-            decimal tmp;
+            
             for(int i = 0; i < text.Length; i++)
             {
-                tmp = Calculation.FastPow((int)text[i], Calculation.e) % Calculation.n;
+                BigInteger tmp = Calculation.FastPow((int)text[i], Calculation.e) % Calculation.n;
                 answer.Add(Convert.ToChar((int)(tmp % 255)));
             }
             return answer;

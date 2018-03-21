@@ -1,13 +1,6 @@
 ﻿using important_information_store.Methods;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace important_information_store
@@ -16,7 +9,9 @@ namespace important_information_store
     {
         public string path;
         public Information data = new Information();
-        public int secretCode;
+        public int secret_D;
+        public int secret_N;
+        public int public_E;
 
         public Form1()
         {
@@ -51,23 +46,36 @@ namespace important_information_store
         {
             var First_Method = new RSA();
 
-            path = textBox1.Text;
-            textBox1.Text = "";
-
             try
             {
-                data.msg = File.ReadAllText(path);
-                First_Method.Method(data.msg, secretCode, path);
+                path = textBox1.Text;
+                textBox1.Text = "";
+                secret_N = Convert.ToInt32(textBox2.Text);
+                textBox2.Text = "";
+                secret_D = Convert.ToInt32(textBox3.Text);
+                textBox3.Text = "";
+                public_E = Convert.ToInt32(textBox4.Text);
+                textBox4.Text = "";
+
+                try
+                {
+                    data.msg = File.ReadAllText(path);
+                    data.msg = Convert.ToString(data.msg);
+                    First_Method.Method(data.msg, secret_D, secret_N, public_E, path);
+                }
+                catch
+                {
+                    var msg = MessageBox.Show("Error");
+                }
             }
             catch
             {
-                var msg = MessageBox.Show("Error");
+                textBox1.Text = "";
+                textBox2.Text = "";
+                textBox3.Text = "";
+                textBox4.Text = "";
+                MessageBox.Show("Incorrect incomming data!");
             }
-        }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
         }
     }
 
